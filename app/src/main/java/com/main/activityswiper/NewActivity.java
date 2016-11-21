@@ -31,9 +31,10 @@ public class NewActivity extends AppCompatActivity {
 
         getWindow().setLayout((int) (width * .9), (int) (height * .9));
         Button btn = (Button)findViewById(R.id.button2);
+
         RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.hanger);
 
-        relativeLayout.setOnTouchListener(new onSwipeTouchListener(this, relativeLayout, relativeLayout) {
+        relativeLayout.setOnTouchListener(new onSwipeTouchListener(this, relativeLayout, relativeLayout,SlideDirection.SLIDE_BOTTOM) {
             public void onSwipeTop() {
             }
 
