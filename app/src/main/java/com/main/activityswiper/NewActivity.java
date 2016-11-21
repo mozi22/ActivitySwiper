@@ -1,5 +1,6 @@
 package com.main.activityswiper;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,7 +17,7 @@ import android.widget.RelativeLayout;
 /**
  * Created by Muazzam on 11/18/2016.
  */
-public class NewActivity extends AppCompatActivity {
+public class NewActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class NewActivity extends AppCompatActivity {
 
         RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.hanger);
 
-        relativeLayout.setOnTouchListener(new onSwipeTouchListener(this, relativeLayout, relativeLayout,SlideDirection.SLIDE_TOP) {
+        relativeLayout.setOnTouchListener(new onSwipeTouchListener(this, relativeLayout, relativeLayout,SlideDirection.SLIDE_BOTTOM) {
             public void onSwipeTop() {
             }
 

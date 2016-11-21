@@ -27,6 +27,9 @@ public class onSwipeTouchListener implements View.OnTouchListener {
     // they want the slide functionality
     private SlideDirection direction;
 
+    // manages how fast the activity should slide.
+    private int slideSpeed = 200;
+
 
     // the width and height of the activity screen ( not the view ).
     int screen_height = 0;
@@ -43,6 +46,9 @@ public class onSwipeTouchListener implements View.OnTouchListener {
     private int viewLocationY = 0;
     private int viewLocationX = 0;
 
+
+
+    public void setSlideSpeed(int speed) { this.slideSpeed = speed; }
 
     public onSwipeTouchListener (Activity ac,View parentView,View childView, SlideDirection direction){
 
@@ -126,17 +132,11 @@ public class onSwipeTouchListener implements View.OnTouchListener {
                 // of the view on dragging. And pass it to MoveView function
                 // if AllowMovement allows us to do it.
 
-                if(this.direction == SlideDirection.SLIDE_BOTTOM){
+                if(this.direction == SlideDirection.SLIDE_BOTTOM || this.direction == SlideDirection.SLIDE_TOP){
                     viewLocationY = Y - _yDelta;
                 }
-                else if(this.direction == SlideDirection.SLIDE_TOP){
-                    viewLocationY = Y - _yDelta;
-                }
-                else if(this.direction == SlideDirection.SLIDE_LEFT){
+                else if(this.direction == SlideDirection.SLIDE_LEFT || this.direction == SlideDirection.SLIDE_RIGHT){
                     viewLocationX = X - _xDelta;
-                }
-                else if(this.direction == SlideDirection.SLIDE_RIGHT){
-                    viewLocationX = X + _xDelta;
                 }
 
                 if(AllowMovement(viewLocationX,viewLocationY)){
@@ -162,12 +162,12 @@ public class onSwipeTouchListener implements View.OnTouchListener {
             }
         }
         else if(this.direction == SlideDirection.SLIDE_LEFT){
-            if(locationX > view.getWidth()){
+            if(locationX > 0){
                 return false;
             }
         }
         else if(this.direction == SlideDirection.SLIDE_RIGHT){
-            if(locationX < view.getWidth()){
+            if(locationX < 0){
                 return false;
             }
         }
@@ -178,16 +178,16 @@ public class onSwipeTouchListener implements View.OnTouchListener {
         // than close the activity
 
         if(SlideDirection.SLIDE_BOTTOM == this.direction){
-            MoveView(200, dX, screen_height);
+            MoveView(slideSpeed,dX, screen_height);
         }
         else if(SlideDirection.SLIDE_TOP == this.direction){
-            MoveView(200, dX, -screen_height);
+            MoveView(slideSpeed,dX, -screen_height);
         }
         else if(SlideDirection.SLIDE_LEFT == this.direction){
-            MoveView(200, 0, dY);
+            MoveView(slideSpeed, 0, dY);
         }
         else if(SlideDirection.SLIDE_RIGHT == this.direction){
-            MoveView(200,screen_width, dY);
+            MoveView(slideSpeed,screen_width, dY);
         }
 
         // this is used such that the animation for sliding completes before the activity
