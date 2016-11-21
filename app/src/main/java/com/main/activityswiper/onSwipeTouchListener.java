@@ -19,7 +19,8 @@ public class onSwipeTouchListener implements View.OnTouchListener {
     private final GestureDetector gestureDetector;
     private View view;
     int dX, dY;
-    float initialViewLocation;
+    float initialViewLocationX;
+    float initialViewLocationY;
     private View grabbedView;
     private Activity activity;
 
@@ -35,13 +36,16 @@ public class onSwipeTouchListener implements View.OnTouchListener {
     public onSwipeTouchListener (Activity ac,View parentView,View childView, SlideDirection direction){
 
         this.view = parentView;
-        initialViewLocation = this.view.getY();
+
+        initialViewLocationY = childView.getY();
+        initialViewLocationX = childView.getX();
+
         gestureDetector = new GestureDetector(ac.getApplicationContext(), new GestureListener());
+
         this.grabbedView = childView;
         this.activity = ac;
         this.direction = direction;
 
-        this.initialViewLocation = grabbedView.getY();
 
         Display display = ac.getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -71,31 +75,29 @@ public class onSwipeTouchListener implements View.OnTouchListener {
             case MotionEvent.ACTION_UP:
 
                 if(SlideDirection.SLIDE_BOTTOM == this.direction){
-
                     if(event.getRawY() >= (60*screen_height)/100){
-
-                        // than close the activity
-                        MoveView(200, screen_height);
-                        Thread thread = new Thread(){
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(300); // As I am using LENGTH_LONG in Toast
-                                    activity.finish();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        };
-
-                        thread.start();
+                        CloseActivity();
                     }
                 }
-
+                else if(SlideDirection.SLIDE_TOP == this.direction){
+                    if(event.getRawY() <= (60*screen_height)/100){
+                        CloseActivity();
+                    }
+                }
+                else if(SlideDirection.SLIDE_RIGHT == this.direction){
+                    if(event.getRawX() >= (60*screen_width)/100){
+                        CloseActivity();
+                    }
+                }
+                else if(SlideDirection.SLIDE_LEFT == this.direction){
+                    if(event.getRawX() <= (60*screen_width)/100){
+                        CloseActivity();
+                    }
+                }
                 // if we've slided down the activity more than 60% of screen height.
                 else{
                     // Slide the view back to the original(default) location.
-                    MoveView(200, initialViewLocation);
+                    MoveView(200, initialViewLocationX,initialViewLocationY);
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -104,25 +106,27 @@ public class onSwipeTouchListener implements View.OnTouchListener {
                 break;
             case MotionEvent.ACTION_MOVE:
 
-                // here we calculate the new location of the view on dragging. And pass it
-                // to MoveView function if AllowMovement allows us to do it.
+                // here we calculate the new locationX and locationY
+                // of the view on dragging. And pass it to MoveView function
+                // if AllowMovement allows us to do it.
 
-                int viewLocation = 0;
+                int viewLocationY = 0;
+                int viewLocationX = 0;
                 if(this.direction == SlideDirection.SLIDE_BOTTOM){
-                    viewLocation = Y - _yDelta;
+                    viewLocationY = Y - _yDelta;
                 }
                 else if(this.direction == SlideDirection.SLIDE_TOP){
-                    viewLocation = Y + _yDelta;
+                    viewLocationY = Y + _yDelta;
                 }
                 else if(this.direction == SlideDirection.SLIDE_LEFT){
-                    viewLocation = X - _xDelta;
+                    viewLocationX = X - _xDelta;
                 }
                 else if(this.direction == SlideDirection.SLIDE_RIGHT){
-                    viewLocation = X + _xDelta;
+                    viewLocationX = X + _xDelta;
                 }
 
-                if(AllowMovement(viewLocation)){
-                    MoveView(0, viewLocation);
+                if(AllowMovement(viewLocationX,viewLocationY)){
+                    MoveView(0, viewLocationX, viewLocationY);
                 }
                 break;
         }
@@ -130,29 +134,56 @@ public class onSwipeTouchListener implements View.OnTouchListener {
     }
 
     private void CloseActivity(){
+        // than close the activity
+
+        if(SlideDirection.SLIDE_BOTTOM == this.direction){
+            MoveView(200, dX, screen_height);
+        }
+        else if(SlideDirection.SLIDE_TOP == this.direction){
+            MoveView(200, dX, 0);
+        }
+        else if(SlideDirection.SLIDE_LEFT == this.direction){
+            MoveView(200, 0, dY);
+        }
+        else if(SlideDirection.SLIDE_RIGHT == this.direction){
+            MoveView(200,screen_width, dY);
+        }
+
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(300); // As I am using LENGTH_LONG in Toast
+                    activity.finish();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
 
     }
 
     // this function will check that the view is not being moved in the opposite
-    // direction from the one specified.
-    private boolean AllowMovement(int location){
+    // direction from the one specified using the SlideDirection parameter
+    private boolean AllowMovement(int locationX,int locationY){
         if(this.direction == SlideDirection.SLIDE_BOTTOM){
-            if(location>0){
+            if(locationY < 0){
                 return false;
             }
         }
         else if(this.direction == SlideDirection.SLIDE_TOP){
-            if(location > view.getHeight()){
+            if(locationY > view.getHeight()){
                 return false;
             }
         }
         else if(this.direction == SlideDirection.SLIDE_LEFT){
-            if(location > view.getWidth()){
+            if(locationX > view.getWidth()){
                 return false;
             }
         }
         else if(this.direction == SlideDirection.SLIDE_RIGHT){
-            if(location < view.getWidth()){
+            if(locationX < view.getWidth()){
                 return false;
             }
         }
@@ -161,10 +192,10 @@ public class onSwipeTouchListener implements View.OnTouchListener {
     }
 
     // Moves the view on the screen.
-    private void MoveView(int duration,float locationY){
+    private void MoveView(int duration,float locationX,float locationY){
 
         view.animate()
-                .x(dX)
+                .x(locationX)
                 .y(locationY)
                 .setDuration(duration)
                 .start();
