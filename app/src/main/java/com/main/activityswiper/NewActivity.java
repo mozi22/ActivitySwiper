@@ -1,6 +1,5 @@
 package com.main.activityswiper;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.widget.Button;
@@ -17,7 +16,6 @@ public class NewActivity extends SwiperDialogActivity {
         setContentView(R.layout.newactivity);
 
 
-
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
@@ -26,22 +24,6 @@ public class NewActivity extends SwiperDialogActivity {
 
         getWindow().setLayout((int) (width * .9), (int) (height * .9));
         Button btn = (Button)findViewById(R.id.button2);
-
-        RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.hanger);
-
-        relativeLayout.setOnTouchListener(new SwiperDialogActivity(this, relativeLayout, relativeLayout,SlideDirection.SLIDE_BOTTOM) {
-            public void onSwipeTop() {
-            }
-
-            public void onSwipeRight() {
-            }
-
-            public void onSwipeLeft() {
-            }
-
-            public void onSwipeBottom() {
-            }
-        });
 
     }
 

@@ -1,15 +1,12 @@
 package com.main.activityswiper;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Point;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
+import android.view.ViewGroup;
 
 /**
  * Created by Muazzam on 8/11/2016.
@@ -17,18 +14,20 @@ import android.widget.Toast;
 public class SwiperDialogActivity extends Activity implements View.OnTouchListener {
 
 
-    private final GestureDetector gestureDetector = new GestureDetector(getApplicationContext(), new GestureListener());
-    private View view;
+    private final GestureDetector gestureDetector;
     private int dX, dY;
     private float initialViewLocationX;
     private float initialViewLocationY;
 
     // an enum that users will be able to use to specify the direciton in which
     // they want the slide functionality
-    protected SlideDirection SWIPERDIALOG_SWIPEDIRECTION = SlideDirection.SLIDE_BOTTOM;
+    protected SwipeDirection SWIPERDIALOG_SWIPEDIRECTION = com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM;
 
     // manages how fast the activity should slide.
     protected int SWIPERDIALOG_SWIPESPEED = 200;
+
+    private View SWIPERDIALOG_PARENTVIEW;
+    protected View SWIPERDIALOG_CHILDVIEW;
 
 
     // the width and height of the activity screen ( not the view ).
@@ -47,27 +46,22 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
     private int viewLocationX = 0;
 
 
-
-    public void setSwipeSpeed(int speed) { this.SWIPERDIALOG_SWIPESPEED = speed; }
-    public void setSwipeDirection(SlideDirection direction) { this.SWIPERDIALOG_SWIPEDIRECTION = direction; }
-
-    public SwiperDialogActivity(View parentView, View childView){
+    public SwiperDialogActivity(){
 
         super();
 
-        this.view = parentView;
+        gestureDetector = new GestureDetector(getApplicationContext(), new GestureListener());
 
-        initialViewLocationY = childView.getY();
-        initialViewLocationX = childView.getX();
+        final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
+                .findViewById(android.R.id.content)).getChildAt(0);
 
+        this.SWIPERDIALOG_PARENTVIEW = viewGroup;
+        this.SWIPERDIALOG_CHILDVIEW = viewGroup;
 
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
+        initialViewLocationY = this.SWIPERDIALOG_PARENTVIEW.getY();
+        initialViewLocationX = this.SWIPERDIALOG_PARENTVIEW.getX();
 
-        screen_height = size.y;
-        screen_width = size.x;
-
+        CalculateScreenDimensions();
     }
 
 
@@ -84,7 +78,7 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
             case MotionEvent.ACTION_UP:
 
                 boolean ActivityClosed = false;
-                if(SlideDirection.SLIDE_BOTTOM == this.SWIPERDIALOG_SWIPEDIRECTION){
+                if(com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM == this.SWIPERDIALOG_SWIPEDIRECTION){
 
                     // if the user has slided down 60% of the total screen height
                     if(viewLocationY >= (60*screen_height)/100){
@@ -92,21 +86,21 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
                         CloseActivity();
                     }
                 }
-                else if(SlideDirection.SLIDE_TOP == this.SWIPERDIALOG_SWIPEDIRECTION){
+                else if(com.main.activityswiper.SwipeDirection.SLIDE_TOP == this.SWIPERDIALOG_SWIPEDIRECTION){
 
                     if(viewLocationY <= ((60*screen_height)/100)*(-1)){
                         ActivityClosed = true;
                         CloseActivity();
                     }
                 }
-                else if(SlideDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
+                else if(com.main.activityswiper.SwipeDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
                     if(viewLocationX >= (60*screen_width)/100){
 
                         ActivityClosed = true;
                         CloseActivity();
                     }
                 }
-                else if(SlideDirection.SLIDE_LEFT == this.SWIPERDIALOG_SWIPEDIRECTION){
+                else if(com.main.activityswiper.SwipeDirection.SLIDE_LEFT == this.SWIPERDIALOG_SWIPEDIRECTION){
                     if(viewLocationX <= (60*screen_width)/100){
 
                         ActivityClosed = true;
@@ -130,10 +124,10 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
                 // of the view on dragging. And pass it to MoveView function
                 // if AllowMovement allows us to do it.
 
-                if(this.SWIPERDIALOG_SWIPEDIRECTION == SlideDirection.SLIDE_BOTTOM || this.SWIPERDIALOG_SWIPEDIRECTION == SlideDirection.SLIDE_TOP){
+                if(this.SWIPERDIALOG_SWIPEDIRECTION == com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM || this.SWIPERDIALOG_SWIPEDIRECTION == com.main.activityswiper.SwipeDirection.SLIDE_TOP){
                     viewLocationY = Y - _yDelta;
                 }
-                else if(this.SWIPERDIALOG_SWIPEDIRECTION == SlideDirection.SLIDE_LEFT || this.SWIPERDIALOG_SWIPEDIRECTION == SlideDirection.SLIDE_RIGHT){
+                else if(this.SWIPERDIALOG_SWIPEDIRECTION == com.main.activityswiper.SwipeDirection.SLIDE_LEFT || this.SWIPERDIALOG_SWIPEDIRECTION == com.main.activityswiper.SwipeDirection.SLIDE_RIGHT){
                     viewLocationX = X - _xDelta;
                 }
 
@@ -147,24 +141,24 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
 
 
     // this function will check that the view is not being moved in the opposite
-    // direction from the one specified using the SlideDirection parameter
+    // direction from the one specified using the SwipeDirection parameter
     private boolean AllowMovement(int locationX,int locationY){
-        if(this.SWIPERDIALOG_SWIPEDIRECTION == SlideDirection.SLIDE_BOTTOM){
+        if(this.SWIPERDIALOG_SWIPEDIRECTION == com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM){
             if(locationY < 0){
                 return false;
             }
         }
-        else if(this.SWIPERDIALOG_SWIPEDIRECTION == SlideDirection.SLIDE_TOP){
+        else if(this.SWIPERDIALOG_SWIPEDIRECTION == com.main.activityswiper.SwipeDirection.SLIDE_TOP){
             if(locationY > 0){
                 return false;
             }
         }
-        else if(this.SWIPERDIALOG_SWIPEDIRECTION == SlideDirection.SLIDE_LEFT){
+        else if(this.SWIPERDIALOG_SWIPEDIRECTION == com.main.activityswiper.SwipeDirection.SLIDE_LEFT){
             if(locationX > 0){
                 return false;
             }
         }
-        else if(this.SWIPERDIALOG_SWIPEDIRECTION == SlideDirection.SLIDE_RIGHT){
+        else if(this.SWIPERDIALOG_SWIPEDIRECTION == com.main.activityswiper.SwipeDirection.SLIDE_RIGHT){
             if(locationX < 0){
                 return false;
             }
@@ -175,16 +169,16 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
     private void CloseActivity(){
         // than close the activity
 
-        if(SlideDirection.SLIDE_BOTTOM == this.SWIPERDIALOG_SWIPEDIRECTION){
+        if(com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM == this.SWIPERDIALOG_SWIPEDIRECTION){
             MoveView(this.SWIPERDIALOG_SWIPESPEED,dX, screen_height);
         }
-        else if(SlideDirection.SLIDE_TOP == this.SWIPERDIALOG_SWIPEDIRECTION){
+        else if(com.main.activityswiper.SwipeDirection.SLIDE_TOP == this.SWIPERDIALOG_SWIPEDIRECTION){
             MoveView(this.SWIPERDIALOG_SWIPESPEED,dX, -screen_height);
         }
-        else if(SlideDirection.SLIDE_LEFT == this.SWIPERDIALOG_SWIPEDIRECTION){
+        else if(com.main.activityswiper.SwipeDirection.SLIDE_LEFT == this.SWIPERDIALOG_SWIPEDIRECTION){
             MoveView(this.SWIPERDIALOG_SWIPESPEED, 0, dY);
         }
-        else if(SlideDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
+        else if(com.main.activityswiper.SwipeDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
             MoveView(this.SWIPERDIALOG_SWIPESPEED,screen_width, dY);
         }
 
@@ -208,11 +202,21 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
     // Moves the view on the screen.
     private void MoveView(int duration,float locationX,float locationY){
 
-        view.animate()
+        SWIPERDIALOG_PARENTVIEW.animate()
                 .x(locationX)
                 .y(locationY)
                 .setDuration(duration)
                 .start();
+    }
+
+    private void CalculateScreenDimensions(){
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        screen_height = size.y;
+        screen_width = size.x;
     }
 
 
