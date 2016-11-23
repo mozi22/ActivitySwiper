@@ -10,6 +10,12 @@ import android.view.ViewGroup;
 
 /**
  * Created by Muazzam on 8/11/2016.
+ *
+ * Todo:
+ *
+ * Enable User to set the percentage of the screenSize dragged in order to close the activity
+ * If you slide bottom by dragging through button - the activity doesn't close ( it's a bug )
+ *
  */
 public class SwiperDialogActivity implements View.OnTouchListener {
 
@@ -83,28 +89,35 @@ public class SwiperDialogActivity implements View.OnTouchListener {
                 if(com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM == this.SWIPERDIALOG_SWIPEDIRECTION){
 
                     // if the user has slided down 60% of the total screen height
-                    if(viewLocationY >= (60*screen_height)/100){
+                    if(SWIPERDIALOG_PARENTVIEW.getY()  >= (60*screen_height)/100){
                         ActivityClosed = true;
                         CloseActivity();
                     }
                 }
                 else if(com.main.activityswiper.SwipeDirection.SLIDE_TOP == this.SWIPERDIALOG_SWIPEDIRECTION){
 
-                    if(viewLocationY <= ((60*screen_height)/100)*(-1)){
+                    if((SWIPERDIALOG_PARENTVIEW.getY()+SWIPERDIALOG_PARENTVIEW.getHeight()) <= ((60*screen_height)/100)*(-1)){
                         ActivityClosed = true;
                         CloseActivity();
                     }
                 }
                 else if(com.main.activityswiper.SwipeDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
-                    if(viewLocationX >= (60*screen_width)/100){
-
+                    if((SWIPERDIALOG_PARENTVIEW.getX()) >= (60*screen_width)/100){
                         ActivityClosed = true;
                         CloseActivity();
                     }
                 }
                 else if(com.main.activityswiper.SwipeDirection.SLIDE_LEFT == this.SWIPERDIALOG_SWIPEDIRECTION){
-                    if(viewLocationX <= (60*screen_width)/100){
 
+                    /*
+                     *  ParentView.getX() + ParentView.getWidth()
+                     *
+                     *  We used the above formula because we want to make sure the right corner of
+                     *  the ParentView passes more than 60% towards the left in order to close the
+                     *  activity.
+                     */
+
+                    if((SWIPERDIALOG_PARENTVIEW.getX() + SWIPERDIALOG_PARENTVIEW.getWidth()) <= (60*screen_width)/100){
                         ActivityClosed = true;
                         CloseActivity();
                     }
@@ -113,7 +126,7 @@ public class SwiperDialogActivity implements View.OnTouchListener {
                 // if the activity is not slided enough to close it. Than slide it back
                 // to it's original(default) position
                 if(!ActivityClosed){
-                    MoveView(200, initialViewLocationX,initialViewLocationY);
+                    MoveView(SWIPERDIALOG_SWIPESPEED, initialViewLocationX,initialViewLocationY);
                 }
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -160,7 +173,17 @@ public class SwiperDialogActivity implements View.OnTouchListener {
             MoveView(this.SWIPERDIALOG_SWIPESPEED,dX, -screen_height);
         }
         else if(com.main.activityswiper.SwipeDirection.SLIDE_LEFT == this.SWIPERDIALOG_SWIPEDIRECTION){
-            MoveView(this.SWIPERDIALOG_SWIPESPEED, 0, dY);
+
+            /*
+             *   0 represents the top right X location of the ParentView.
+             *   So if the user slides left more than 60% of the total view area than
+             *   animate the view to -(width of the parent view)
+             *   this will give us a -ve value equal to the width of the view.
+             *   Which means the right side of the view will go to 0 hence animating the
+             *   view towards the left.
+             */
+
+            MoveView(this.SWIPERDIALOG_SWIPESPEED, -screen_width, dY);
         }
         else if(com.main.activityswiper.SwipeDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
             MoveView(this.SWIPERDIALOG_SWIPESPEED,screen_width, dY);
