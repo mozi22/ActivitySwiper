@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 /**
  * Created by Muazzam on 8/11/2016.
  */
-public class SwiperDialogActivity extends Activity implements View.OnTouchListener {
+public class SwiperDialogActivity implements View.OnTouchListener {
 
 
     private final GestureDetector gestureDetector;
@@ -26,13 +26,14 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
     // manages how fast the activity should slide.
     protected int SWIPERDIALOG_SWIPESPEED = 200;
 
-    private View SWIPERDIALOG_PARENTVIEW;
-    protected View SWIPERDIALOG_CHILDVIEW;
+    protected View SWIPERDIALOG_PARENTVIEW;
 
 
     // the width and height of the activity screen ( not the view ).
     private int screen_height = 0;
     private int screen_width = 0;
+
+    private Activity activity;
 
 
     // different in the actual position of the view and the place where the user touched.
@@ -46,17 +47,18 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
     private int viewLocationX = 0;
 
 
-    public SwiperDialogActivity(){
+    public SwiperDialogActivity(Activity activity){
 
         super();
 
-        gestureDetector = new GestureDetector(getApplicationContext(), new GestureListener());
+        this.activity = activity;
 
-        final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this
+        gestureDetector = new GestureDetector(activity, new GestureListener());
+
+        final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) activity
                 .findViewById(android.R.id.content)).getChildAt(0);
 
         this.SWIPERDIALOG_PARENTVIEW = viewGroup;
-        this.SWIPERDIALOG_CHILDVIEW = viewGroup;
 
         initialViewLocationY = this.SWIPERDIALOG_PARENTVIEW.getY();
         initialViewLocationX = this.SWIPERDIALOG_PARENTVIEW.getX();
@@ -138,6 +140,48 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
         }
         return gestureDetector.onTouchEvent(event);
     }
+    // Moves the view on the screen.
+    private void MoveView(int duration,float locationX,float locationY){
+
+        SWIPERDIALOG_PARENTVIEW.animate()
+                .x(locationX)
+                .y(locationY)
+                .setDuration(duration)
+                .start();
+    }
+
+    private void CloseActivity(){
+        // than close the activity
+
+        if(com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM == this.SWIPERDIALOG_SWIPEDIRECTION){
+            MoveView(this.SWIPERDIALOG_SWIPESPEED,dX, screen_height);
+        }
+        else if(com.main.activityswiper.SwipeDirection.SLIDE_TOP == this.SWIPERDIALOG_SWIPEDIRECTION){
+            MoveView(this.SWIPERDIALOG_SWIPESPEED,dX, -screen_height);
+        }
+        else if(com.main.activityswiper.SwipeDirection.SLIDE_LEFT == this.SWIPERDIALOG_SWIPEDIRECTION){
+            MoveView(this.SWIPERDIALOG_SWIPESPEED, 0, dY);
+        }
+        else if(com.main.activityswiper.SwipeDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
+            MoveView(this.SWIPERDIALOG_SWIPESPEED,screen_width, dY);
+        }
+
+        // this is used such that the animation for sliding completes before the activity
+        // disappears.
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(200); // As I am using LENGTH_LONG in Toast
+                    activity.finish();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
+
+    }
 
 
     // this function will check that the view is not being moved in the opposite
@@ -166,52 +210,11 @@ public class SwiperDialogActivity extends Activity implements View.OnTouchListen
         return true;
     }
 
-    private void CloseActivity(){
-        // than close the activity
 
-        if(com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM == this.SWIPERDIALOG_SWIPEDIRECTION){
-            MoveView(this.SWIPERDIALOG_SWIPESPEED,dX, screen_height);
-        }
-        else if(com.main.activityswiper.SwipeDirection.SLIDE_TOP == this.SWIPERDIALOG_SWIPEDIRECTION){
-            MoveView(this.SWIPERDIALOG_SWIPESPEED,dX, -screen_height);
-        }
-        else if(com.main.activityswiper.SwipeDirection.SLIDE_LEFT == this.SWIPERDIALOG_SWIPEDIRECTION){
-            MoveView(this.SWIPERDIALOG_SWIPESPEED, 0, dY);
-        }
-        else if(com.main.activityswiper.SwipeDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
-            MoveView(this.SWIPERDIALOG_SWIPESPEED,screen_width, dY);
-        }
-
-        // this is used such that the animation for sliding completes before the activity
-        // disappears.
-        Thread thread = new Thread(){
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(200); // As I am using LENGTH_LONG in Toast
-                    finish();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread.start();
-
-    }
-
-    // Moves the view on the screen.
-    private void MoveView(int duration,float locationX,float locationY){
-
-        SWIPERDIALOG_PARENTVIEW.animate()
-                .x(locationX)
-                .y(locationY)
-                .setDuration(duration)
-                .start();
-    }
 
     private void CalculateScreenDimensions(){
 
-        Display display = getWindowManager().getDefaultDisplay();
+        Display display = activity.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
 
