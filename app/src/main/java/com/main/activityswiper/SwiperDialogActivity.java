@@ -24,7 +24,7 @@ public class SwiperDialogActivity implements View.OnTouchListener {
     protected SwipeDirection SWIPERDIALOG_SWIPEDIRECTION = com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM;
 
     // manages how fast the activity should slide.
-    protected int SWIPERDIALOG_SWIPESPEED = 200;
+    private int SWIPERDIALOG_SWIPESPEED = 200;
 
     protected View SWIPERDIALOG_PARENTVIEW;
 
@@ -227,8 +227,8 @@ public class SwiperDialogActivity implements View.OnTouchListener {
     // No need to play around with it unless you really need something special.
     private final class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
-        private static final int SWIPE_THRESHOLD = 100;
-        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+        private static final int SWIPE_THRESHOLD = 1;
+        private static final int SWIPE_VELOCITY_THRESHOLD = 10;
 
         @Override
         public boolean onDown(MotionEvent e) {
