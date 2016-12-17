@@ -90,14 +90,15 @@ public class SwiperDialogActivity implements View.OnTouchListener {
                 if(com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM == this.SWIPERDIALOG_SWIPEDIRECTION){
 
                     // if the user has slided down 60% of the total screen height
-                    if(SWIPERDIALOG_PARENTVIEW.getY()  >= ((float)60/100)* screen_width){
+                    if(SWIPERDIALOG_PARENTVIEW.getY()  >= ((float)40/100)* screen_height){
                         ActivityClosed = true;
                         CloseActivity();
                     }
                 }
                 else if(com.main.activityswiper.SwipeDirection.SLIDE_TOP == this.SWIPERDIALOG_SWIPEDIRECTION){
 
-                    if((SWIPERDIALOG_PARENTVIEW.getY()+SWIPERDIALOG_PARENTVIEW.getHeight()) <= (((float)60/100)* screen_width)*(-1)){
+
+                    if((SWIPERDIALOG_PARENTVIEW.getY()+SWIPERDIALOG_PARENTVIEW.getHeight()) <= (((float)60/100)* screen_height)){
                         ActivityClosed = true;
                         CloseActivity();
                     }
@@ -105,17 +106,13 @@ public class SwiperDialogActivity implements View.OnTouchListener {
                 else if(com.main.activityswiper.SwipeDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
 
 
-                    if((SWIPERDIALOG_PARENTVIEW.getX()) >= ((float)60/100)* screen_width){
+                    if((SWIPERDIALOG_PARENTVIEW.getX()) >= ((float)40/100)* screen_width){
                         ActivityClosed = true;
                         CloseActivity();
                     }
                 }
                 else if(com.main.activityswiper.SwipeDirection.SLIDE_LEFT == this.SWIPERDIALOG_SWIPEDIRECTION){
 
-                    float a= ((float)60/100)* screen_width;
-                    Log.i("X value",String.valueOf(SWIPERDIALOG_PARENTVIEW.getX() + SWIPERDIALOG_PARENTVIEW.getWidth()));
-                    Log.i("Screen width Percentage",String.valueOf(a));
-                    Log.i("Screen width",String.valueOf(screen_width));
                     /*
                      *  ParentView.getX() + ParentView.getWidth()
                      *

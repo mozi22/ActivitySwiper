@@ -30,7 +30,7 @@ public class NewActivity extends Activity{
 
         SwiperDialogActivity swiperDialogActivity = new SwiperDialogActivity(this);
         swiperDialogActivity.SWIPERDIALOG_PARENTVIEW = relativeLayout;
-        swiperDialogActivity.SWIPERDIALOG_SWIPEDIRECTION = SwipeDirection.SLIDE_LEFT;
+        swiperDialogActivity.SWIPERDIALOG_SWIPEDIRECTION = SwipeDirection.SLIDE_BOTTOM;
         btn.setOnTouchListener(swiperDialogActivity);
 
     }
