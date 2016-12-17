@@ -89,8 +89,9 @@ public class SwiperDialogActivity implements View.OnTouchListener {
                 boolean ActivityClosed = false;
                 if(com.main.activityswiper.SwipeDirection.SLIDE_BOTTOM == this.SWIPERDIALOG_SWIPEDIRECTION){
 
-                    // if the user has slided down 60% of the total screen height
+                    // if the user has slided down more than 40% ( 40% is the height from the top )
                     if(SWIPERDIALOG_PARENTVIEW.getY()  >= ((float)40/100)* screen_height){
+
                         ActivityClosed = true;
                         CloseActivity();
                     }
@@ -98,6 +99,7 @@ public class SwiperDialogActivity implements View.OnTouchListener {
                 else if(com.main.activityswiper.SwipeDirection.SLIDE_TOP == this.SWIPERDIALOG_SWIPEDIRECTION){
 
 
+                    // if the user has slided up more than 60% ( 60% is the height from the top )
                     if((SWIPERDIALOG_PARENTVIEW.getY()+SWIPERDIALOG_PARENTVIEW.getHeight()) <= (((float)60/100)* screen_height)){
                         ActivityClosed = true;
                         CloseActivity();
@@ -106,6 +108,7 @@ public class SwiperDialogActivity implements View.OnTouchListener {
                 else if(com.main.activityswiper.SwipeDirection.SLIDE_RIGHT == this.SWIPERDIALOG_SWIPEDIRECTION){
 
 
+                    // if the user slides more than 40% ( 40% is the width counted from the left of the screen )
                     if((SWIPERDIALOG_PARENTVIEW.getX()) >= ((float)40/100)* screen_width){
                         ActivityClosed = true;
                         CloseActivity();
