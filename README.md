@@ -9,7 +9,7 @@ Simply copy the class `SwiperDialogActivity` to your program and use it in the f
     // A button inside the activity that will act as a draggable element
     Button btn = (Button)findViewById(R.id.button);
     
-    // The parent container of the activity
+    // The parent container view of the activity
     RelativeLayout parent = (RelativeLayout)findViewById(R.id.parent);
 
     // New instance of the SwiperDialogActivity
